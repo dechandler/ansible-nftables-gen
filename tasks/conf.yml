@@ -1,0 +1,33 @@
+---
+- name: >
+    conf
+    : Ensure defs directory
+  file:
+    path: /etc/nftables-gen/defs
+    state: directory
+    mode: 0700
+  become: True
+
+- name: >
+    conf
+    : Place definitions
+  copy:
+    dest: /etc/nftables-gen/defs/{{ DEFS.key }}.conf
+    content: |
+        {% for def_key, def_value in DEFS.value.items() %}
+        define {{ def_key }} = {{ def_value }}
+        {% endfor %}
+    mode: 0600
+  become: True
+  loop: "{{ (default_defs | dict2items) + (defs | dict2items) }}"
+  loop_control:
+    loop_var: DEFS
+  notify: restart nftables-gen
+
+- name: >
+    conf
+    : Install rule sets to chain directories
+  include_tasks: ruleset.yml
+  loop: "{{ default_rulesets + rulesets }}"
+  loop_control:
+    loop_var: RULESET

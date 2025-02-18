@@ -1,0 +1,4 @@
+---
+- include_tasks: conf.yml
+
+- include_tasks: install.yml

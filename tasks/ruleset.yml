@@ -1,0 +1,39 @@
+---
+- name: >
+    ruleset
+    : Set chain directory path
+  set_fact:
+    chain_dir: >-
+        /etc/nftables-gen/hooks/{{
+          RULESET.table | default("inet")
+        }}/{{
+          RULESET.chain | default("filter-input")
+        }}.d
+
+
+- name: >
+    ruleset
+    : Ensure chain directory
+  file:
+    path: "{{ chain_dir }}"
+    state: directory
+    mode: 0700
+  become: True
+
+
+- name: >
+    ruleset
+    : Place rule set in chain directory
+  copy:
+    dest: >-
+        {{
+            chain_dir
+        }}/{{
+            RULESET.priority | default("50")
+        }}-{{
+            RULESET.name
+        }}.conf
+    content: "{{ RULESET.rules }}"
+    mode: 0600
+  become: True
+  notify: restart nftables-gen

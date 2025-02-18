@@ -1,0 +1,43 @@
+---
+- name: >
+    install
+    : Copy table generation script
+  copy:
+    src: nftables-gen.sh
+    dest: /usr/local/bin/nftables-gen.sh
+    mode: 0755
+  become: True
+
+
+- name: >
+    install
+    : Place systemd service file
+  template:
+    src: nftables-gen.service
+    dest: /etc/systemd/system/nftables-gen.service
+    mode: 0644
+  become: True
+
+
+- name: >
+    install
+    : Stop and disable other firewall abstraction services
+  systemd_service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: False
+  become: True
+  loop:
+    - firewalld
+    - ufw
+  failed_when: False
+
+
+- name: >
+    install
+    : Reload systemd service and enable at boot
+  systemd_service:
+    name: nftables-gen
+    enabled: True
+    daemon-reload: True
+  become: True

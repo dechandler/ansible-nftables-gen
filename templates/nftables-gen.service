@@ -1,0 +1,22 @@
+[Unit]
+Description=Nftables from assembled config
+Documentation=man:nft(8)
+Wants=network-pre.target
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+ProtectHome=true
+
+ExecStart=/usr/local/bin/nftables-gen.sh start
+{% for service in restart_services %}
+ExecStart=/bin/systemctl restart {{ service }}
+{% endfor %}
+
+ExecStop=/usr/local/bin/nftables-gen.sh stop
+
+RemainAfterExit=yes
+
+
+[Install]
+WantedBy=multi-user.target
