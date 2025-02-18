@@ -63,20 +63,6 @@ function generate () {
 }
 
 
-function start () {
-
-    generate
-
-    /sbin/nft -f /etc/nftables-gen/assembled.conf
-
-}
-
-function stop () {
-
-    /sbin/nft flush ruleset
-
-}
-
 case $1 in
     start)
         generate
