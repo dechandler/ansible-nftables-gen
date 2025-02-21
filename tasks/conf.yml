@@ -15,7 +15,7 @@
     dest: /etc/nftables-gen/defs/{{ DEFS.key }}.conf
     content: |
         {% for def_key, def_value in DEFS.value.items() %}
-        define {{ def_key }} = {{ def_value }}
+        define {{ def_key | replace('-', '_')}} = {{ def_value }}
         {% endfor %}
     mode: 0600
   become: True
